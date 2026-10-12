@@ -2,15 +2,16 @@ import { Modal, Notice, Setting, type App } from 'obsidian';
 import type SceneSubtreeMoverPlugin from './main';
 import type { OrderPreview } from './main';
 import { isPro, onProChange } from './pro';
-import { moveTree, readTree, sameOrder, sceneChoices, siblingGroup, treeLines, writeTree } from './tree';
+import { containsPath, moveSubtree, readTree, sameOrder, sceneChoices, siblingGroup, treeLines, writeTree } from './tree';
 
 export class SceneMoverModal extends Modal {
 	private selected: number[] = [0];
 	private position = 0;
+	private parent: number[] = [];
 	private moves = 0;
 	private orderName = '';
 	private savedName = '';
-	private status = 'Select a chapter and its final sibling position. Preview before you apply.';
+	private status = 'Select a chapter, its destination parent, and its final position. Preview before you apply.';
 	private pending = false;
 	private complete = false;
 	private proOpen = false;
@@ -50,7 +51,7 @@ export class SceneMoverModal extends Modal {
 
 	private stage(): void {
 		if (this.moves > 0) this.plugin.requirePro();
-		const next = moveTree(this.preview.after, { path: this.selected, position: this.position });
+		const next = moveSubtree(this.preview.after, { path: this.selected, parent: this.parent, position: this.position });
 		if (sameOrder(next, this.preview.after)) {
 			this.status = sameOrder(this.preview.before, this.preview.after)
 				? 'The order is unchanged. No write or backup is needed.'
@@ -63,6 +64,7 @@ export class SceneMoverModal extends Modal {
 		this.status = `${this.moves} move${this.moves === 1 ? '' : 's'} in the preview. Check the full resulting order before Apply.`;
 		this.selected = [0];
 		this.position = 0;
+		this.parent = [];
 	}
 
 	private button(container: HTMLElement, action: string, label: string, disabled: boolean, fn: () => Promise<void> | void, cta = false): void {
@@ -85,14 +87,29 @@ export class SceneMoverModal extends Modal {
 			dropdown.setValue(JSON.stringify(this.selected)).setDisabled(!choices.length || this.pending || this.complete).onChange((value) => {
 				this.selected = JSON.parse(value) as number[];
 				this.position = this.selected[this.selected.length - 1]!;
+				this.parent = this.selected.slice(0, -1);
 				this.render();
 			});
 		});
-		const group = choices.length ? siblingGroup(this.preview.after, this.selected) : [];
-		new Setting(controls).setName('Final sibling position').setDesc('Moves stay within this parent group.').addDropdown((dropdown) => {
+		new Setting(controls).setName('Destination parent').setDesc('The complete subtree moves with the selected scene.').addDropdown((dropdown) => {
+			dropdown.selectEl.dataset.field = 'parent';
+			dropdown.addOption('[]', 'Manuscript root');
+			for (const choice of choices) {
+				if (!containsPath(this.selected, choice.path)) dropdown.addOption(JSON.stringify(choice.path), choice.label);
+			}
+			dropdown.setValue(JSON.stringify(this.parent)).setDisabled(!choices.length || this.pending || this.complete).onChange((value) => {
+				this.parent = JSON.parse(value) as number[];
+				this.position = JSON.stringify(this.parent) === JSON.stringify(this.selected.slice(0, -1)) ? this.selected[this.selected.length - 1]! : 0;
+				this.render();
+			});
+		});
+		const group = this.parent.length ? (siblingGroup(this.preview.after, this.parent)[this.parent[this.parent.length - 1]!]!.children ?? []) : this.preview.after;
+		const sameParent = JSON.stringify(this.parent) === JSON.stringify(this.selected.slice(0, -1));
+		new Setting(controls).setName('Final position').setDesc('Choose the final numbered slot under the destination parent.').addDropdown((dropdown) => {
 			dropdown.selectEl.dataset.field = 'position';
-			group.forEach((node, index) => { dropdown.addOption(String(index), `${index + 1} · ${node.name}`); });
-			dropdown.setValue(String(this.position)).setDisabled(!group.length || this.pending || this.complete).onChange((value) => { this.position = Number(value); });
+			group.forEach((node, index) => { dropdown.addOption(String(index), `${index + 1} · ${sameParent ? node.name : 'Before ' + node.name}`); });
+			if (!sameParent) dropdown.addOption(String(group.length), `${group.length + 1} · At end`);
+			dropdown.setValue(String(this.position)).setDisabled(!choices.length || this.pending || this.complete).onChange((value) => { this.position = Number(value); });
 		});
 		const actions = el.createDiv('ssm-actions');
 		this.button(actions, 'preview', this.moves ? 'Add move (Pro)' : 'Preview move', !choices.length || (this.moves > 0 && !isPro()), () => this.stage());
@@ -102,6 +119,7 @@ export class SceneMoverModal extends Modal {
 			this.moves = 0;
 			this.selected = [0];
 			this.position = 0;
+			this.parent = [];
 			this.status = 'Preview reset. The index has not changed.';
 		});
 		this.button(actions, 'apply', 'Back up and apply', sameOrder(this.preview.before, this.preview.after), async () => {
@@ -146,6 +164,7 @@ export class SceneMoverModal extends Modal {
 			this.moves = 1;
 			this.selected = [0];
 			this.position = 0;
+			this.parent = [];
 			this.status = `Saved order preview: ${order.name}. Scenes and parent relationships match. Apply makes a backup first.`;
 		});
 	}

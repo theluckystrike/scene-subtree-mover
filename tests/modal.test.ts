@@ -41,10 +41,54 @@ describe('mover controls', () => {
 		expect(f.modal.contentEl.querySelector<HTMLButtonElement>('[data-action="preview"]')?.disabled).toBe(false);
 		expect(f.modal.contentEl.querySelector<HTMLButtonElement>('[data-action="apply"]')?.disabled).toBe(true);
 	});
-	it('limits nested scene destinations to the same sibling group', async () => {
+	it('starts a nested scene in its current sibling group', async () => {
 		const f = await modalFixture(); select(f.modal, 'chapter', '[0,0]');
 		const options = f.modal.contentEl.querySelector<HTMLSelectElement>('[data-field="position"]')!.options;
 		expect([...options].map((o) => o.textContent)).toEqual(['1 · a1']);
+	});
+	it('previews a free parent change and applies with descendants', async () => {
+		const f = await modalFixture();
+		select(f.modal, 'parent', '[1]');
+		await press(f.modal, 'preview');
+		expect(f.modal.contentEl.querySelector('[data-tree="after"]')?.textContent).toBe('1. B\n  1. A\n    1. a1\n      1. x\n2. C');
+		expect(await f.app.vault.read(f.file)).toBe(f.source);
+		await press(f.modal, 'apply');
+		expect(f.modal.contentEl.querySelector('.ssm-status')?.textContent).toContain('Order applied. Backup:');
+		expect(f.app.vault.getFiles()).toHaveLength(2);
+	});
+	it('moves a subtree to another parent without ES2022 Array.prototype.at', async () => {
+		// The build target is ES2021. Older mobile WebViews do not have Array.prototype.at.
+		const f = await modalFixture(['A', ['a1'], 'B', ['b1']]);
+		const at = Object.getOwnPropertyDescriptor(Array.prototype, 'at')!;
+		delete (Array.prototype as { at?: unknown }).at;
+		try {
+			select(f.modal, 'chapter', '[0,0]');
+			select(f.modal, 'parent', '[1]');
+			select(f.modal, 'position', '1');
+			await press(f.modal, 'preview');
+			expect(f.modal.contentEl.querySelector('[data-tree="after"]')?.textContent).toBe('1. A\n2. B\n  1. b1\n  2. a1');
+		} finally {
+			Object.defineProperty(Array.prototype, 'at', at);
+		}
+	});
+	it('excludes the selected scene and its descendants as parents', async () => {
+		const f = await modalFixture();
+		const options = f.modal.contentEl.querySelector<HTMLSelectElement>('[data-field="parent"]')!.options;
+		expect([...options].map((o) => o.value)).toEqual(['[]', '[1]', '[2]']);
+	});
+	it('offers root promotion and an end slot in another parent group', async () => {
+		const f = await modalFixture(['A', ['a1'], 'B', ['b1']]);
+		select(f.modal, 'chapter', '[0,0]');
+		select(f.modal, 'parent', '[1]');
+		const options = f.modal.contentEl.querySelector<HTMLSelectElement>('[data-field="position"]')!.options;
+		expect([...options].map((o) => o.textContent)).toEqual(['1 · Before b1', '2 · At end']);
+		select(f.modal, 'parent', '[]');
+		select(f.modal, 'position', '2');
+		await press(f.modal, 'preview');
+		expect(f.modal.contentEl.querySelector('[data-tree="after"]')?.textContent).toBe('1. A\n2. B\n  1. b1\n3. a1');
+		await press(f.modal, 'reset');
+		expect(f.modal.contentEl.querySelector<HTMLSelectElement>('[data-field="parent"]')?.value).toBe('[]');
+		expect(await f.app.vault.read(f.file)).toBe(f.source);
 	});
 	it('shows an unchanged order without creating a backup', async () => {
 		const f = await modalFixture(); await press(f.modal, 'preview');

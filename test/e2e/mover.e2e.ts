@@ -72,6 +72,23 @@ describe('Scene Subtree Mover in a real vault', function () {
 		expect((await sourceState('Unchanged.md')).source).toBe(initial);
 		expect(await browser.executeObsidian(({ app }) => app.vault.getFiles().filter((f) => f.path.startsWith('Unchanged.scene-backup-')).length)).toBe(0);
 	});
+	it('moves a free subtree to another parent with one full source backup', async function () {
+		await openIndex('ParentMove.md');
+		const values = await browser.$(`${root} [data-field="parent"]`).$$('option').map(async (option) => option.getAttribute('value'));
+		expect(values).toEqual(['[]', '[1]', '[1,0]', '[2]']);
+		await browser.$(`${root} [data-field="parent"]`).selectByAttribute('value', '[1]');
+		await browser.$(`${root} [data-field="position"]`).selectByAttribute('value', '1');
+		await browser.$(`${root} [data-action="preview"]`).click(); await ready('in the preview');
+		expect(await browser.$(`${root} [data-tree="after"]`).getText()).toBe('1. B\n  1. b1\n  2. A\n    1. a1\n      1. x\n2. C');
+		expect((await sourceState('ParentMove.md')).source).toBe(initial);
+		await browser.$(`${root} [data-action="apply"]`).click(); await ready('Order applied. Backup:');
+		const backupPath = (await browser.$(`${root} .ssm-status`).getText()).split('Backup: ')[1];
+		const state = await sourceState('ParentMove.md');
+		expect(state.scenes).toEqual(['B', ['b1', 'A', ['a1', ['x']]], 'C']);
+		expect(state.custom).toBe('keep'); expect(state.body).toBe('\n# Manuscript\nBody stays here.\n');
+		expect(await browser.executeObsidian(async ({ app }, p) => app.vault.read(app.vault.getFileByPath(p)!), backupPath)).toBe(initial);
+		expect(await browser.executeObsidian(({ app }) => app.vault.getFiles().filter((f) => f.path.startsWith('ParentMove.scene-backup-')).length)).toBe(1);
+	});
 	it('keeps an external edit when Apply detects a conflict', async function () {
 		await openIndex('Conflict.md'); await stage(2);
 		await browser.executeObsidian(async ({ app }) => { await app.vault.process(app.vault.getFileByPath('Conflict.md')!, (text) => text + '\nExternal edit.\n'); });

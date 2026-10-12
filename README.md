@@ -1,6 +1,6 @@
 # Scene Subtree Mover
 
-Move a chapter and its child scenes together in a Longform manuscript index. Select a final sibling position, check the resulting order, and apply the change with a full source backup.
+Move a chapter and its child scenes together in a Longform manuscript index. Select a destination parent and final position, check the resulting order, and apply the change with a full source backup.
 
 A Longform child array follows its parent scene name. Moving the name alone can leave the scenes under the wrong chapter. Scene Subtree Mover treats the name and that array as one unit. It reads the active index and keeps nested descendants with their parent.
 
@@ -18,11 +18,19 @@ The reader rejects a child array before a parent, consecutive child arrays, and 
 
 ### Preview one complete move
 
-Select a chapter and its final position among its siblings. Select Preview move to see the complete proposed order next to the current order. The chapter takes its children and their descendants with it. A scene inside a chapter can also move within its own sibling group.
+Select a chapter, keep its current destination parent, and choose its final position among its siblings. Select Preview move to see the complete proposed order next to the current order. The chapter takes its children and their descendants with it. A scene inside a chapter can also move within its own sibling group.
 
 The position is the final numbered slot. For example, position three places the selected chapter third. Reset preview returns to the order read when the modal opened. Before the first move, choosing the current position reports an unchanged order and leaves Apply disabled. After a staged move, this choice keeps the proposed changes.
 
 <img src="https://raw.githubusercontent.com/theluckystrike/scene-subtree-mover/HEAD/docs/preview.png" alt="Chapter one and its descendants move after the other two chapters in the proposed order" width="720">
+
+### Move a subtree to another parent
+
+Select a chapter or scene, then choose Destination parent. Select another chapter to place the subtree under it. Select Manuscript root to promote a nested scene. Choose the final numbered position in that group and select Preview move. The selected scene keeps all its children and descendants. A single move is free.
+
+The destination list excludes the selected scene and its descendants. This prevents a scene from becoming its own parent. The preview rejects moves that exceed the tree limits. Empty child arrays remain valid after the last child moves out. Apply uses the existing source backup and conflict check.
+
+<img src="https://raw.githubusercontent.com/theluckystrike/scene-subtree-mover/HEAD/docs/destination-parent.png" alt="Arrival and its descendants move under Pursuit in the resulting order" width="720">
 
 ### Back up and apply a checked update
 
@@ -58,7 +66,7 @@ When the plugin has a community listing, use Browse in Community plugins and sea
 
 1. Open the manuscript index.
 2. Run Scene Subtree Mover: Move a chapter with its scenes from the command palette.
-3. Select the chapter and its final sibling position.
+3. Select the chapter, destination parent, and final position.
 4. Select Preview move and check both order panels.
 5. Select Back up and apply. Keep the reported backup.
 
@@ -76,7 +84,7 @@ Saved orders belong to the index path. A renamed index does not use orders saved
 
 ### Can I move a chapter into another chapter?
 
-Version one permits sibling reordering. It does not offer drag controls or moves between parent groups. Choose a destination position from the selected scene's sibling group.
+Yes. Choose the other chapter in Destination parent, then choose the final position. The preview keeps all descendants with the selected chapter. You can also choose Manuscript root to promote a scene. The selected scene and its descendants cannot be destination parents.
 
 ### How do I recover the original source?
 

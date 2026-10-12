@@ -8,6 +8,9 @@ export interface SceneMove {
 	path: number[];
 	position: number;
 }
+export interface SubtreeMove extends SceneMove {
+	parent: number[];
+}
 export interface SceneChoice {
 	path: number[];
 	label: string;
@@ -66,6 +69,27 @@ export function moveTree(nodes: SceneNode[], move: SceneMove): SceneNode[] {
 	const [node] = group.splice(move.path[move.path.length - 1]!, 1);
 	group.splice(move.position, 0, node!);
 	return result;
+}
+
+export function containsPath(ancestor: number[], path: number[]): boolean {
+	return path.length >= ancestor.length && ancestor.every((index, i) => path[i] === index);
+}
+
+/** Paths refer to the input tree. Position is the final slot after removal. */
+export function moveSubtree(nodes: SceneNode[], move: SubtreeMove): SceneNode[] {
+	const result = readTree(writeTree(nodes));
+	const source = siblingGroup(result, move.path);
+	if (containsPath(move.path, move.parent)) throw new Error('A scene cannot move under itself or one of its descendants.');
+	// Keep the parent object before removal can change its numeric path.
+	const parent = move.parent.length ? siblingGroup(result, move.parent)[move.parent[move.parent.length - 1]!]! : null;
+	const destination = parent ? (parent.children ?? []) : result;
+	const slots = destination.length - (destination === source ? 1 : 0);
+	if (!Number.isInteger(move.position) || move.position < 0 || move.position > slots) throw new Error('Select a final position in the destination group.');
+	const [node] = source.splice(move.path[move.path.length - 1]!, 1);
+	if (parent) parent.children = destination;
+	destination.splice(move.position, 0, node!);
+	// A new parent array can increase entry count or subtree depth.
+	return readTree(writeTree(result));
 }
 
 /** Explicit destinations outside the source sibling group are refused. */

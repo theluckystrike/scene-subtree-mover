@@ -782,6 +782,419 @@
      "x"
     ]
    ]
+  },
+  {
+   "name": "19 move a chapter under another chapter with descendants",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     [
+      "a1",
+      [
+       "x"
+      ]
+     ],
+     "B"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [
+      1
+     ],
+     "position": 0
+    }
+   ],
+   "expected": [
+    "B",
+    [
+     "A",
+     [
+      "a1",
+      [
+       "x"
+      ]
+     ]
+    ]
+   ]
+  },
+  {
+   "name": "20 move a nested scene to a different chapter",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     [
+      "a1",
+      [
+       "x"
+      ],
+      "a2"
+     ],
+     "B",
+     [
+      "b1"
+     ]
+    ],
+    {
+     "path": [
+      0,
+      0
+     ],
+     "parent": [
+      1
+     ],
+     "position": 1
+    }
+   ],
+   "expected": [
+    "A",
+    [
+     "a2"
+    ],
+    "B",
+    [
+     "b1",
+     "a1",
+     [
+      "x"
+     ]
+    ]
+   ]
+  },
+  {
+   "name": "21 promote a child to the manuscript root",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     [
+      "a1",
+      [
+       "x"
+      ]
+     ],
+     "B"
+    ],
+    {
+     "path": [
+      0,
+      0
+     ],
+     "parent": [],
+     "position": 1
+    }
+   ],
+   "expected": [
+    "A",
+    [],
+    "a1",
+    [
+     "x"
+    ],
+    "B"
+   ]
+  },
+  {
+   "name": "22 keep the target when removal changes its path",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     "B",
+     [
+      "b1"
+     ],
+     "C"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [
+      1
+     ],
+     "position": 0
+    }
+   ],
+   "expected": [
+    "B",
+    [
+     "A",
+     "b1"
+    ],
+    "C"
+   ]
+  },
+  {
+   "name": "23 keep a descendant target when a sibling shifts",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     "B",
+     [
+      "b1"
+     ],
+     "C"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [
+      1,
+      0
+     ],
+     "position": 0
+    }
+   ],
+   "expected": [
+    "B",
+    [
+     "b1",
+     [
+      "A"
+     ]
+    ],
+    "C"
+   ]
+  },
+  {
+   "name": "24 keep duplicate names and empty child arrays",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "Same",
+     [],
+     "Same",
+     []
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [
+      1
+     ],
+     "position": 0
+    }
+   ],
+   "expected": [
+    "Same",
+    [
+     "Same",
+     []
+    ]
+   ]
+  },
+  {
+   "name": "25 keep Unicode scene names",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "海",
+     [
+      "é"
+     ],
+     "章"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [
+      1
+     ],
+     "position": 0
+    }
+   ],
+   "expected": [
+    "章",
+    [
+     "海",
+     [
+      "é"
+     ]
+    ]
+   ]
+  },
+  {
+   "name": "26 refuse a move under the selected scene",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     [
+      "a1"
+     ],
+     "B"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [
+      0
+     ],
+     "position": 0
+    }
+   ],
+   "expected": {
+    "error": "A scene cannot move under itself or one of its descendants."
+   }
+  },
+  {
+   "name": "27 refuse a move under a descendant",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     [
+      "a1",
+      [
+       "x"
+      ]
+     ],
+     "B"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [
+      0,
+      0,
+      0
+     ],
+     "position": 0
+    }
+   ],
+   "expected": {
+    "error": "A scene cannot move under itself or one of its descendants."
+   }
+  },
+  {
+   "name": "28 refuse a missing destination",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     "B"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [
+      9
+     ],
+     "position": 0
+    }
+   ],
+   "expected": {
+    "error": "The selected scene is missing."
+   }
+  },
+  {
+   "name": "29 refuse an invalid final position",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     "B"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [
+      1
+     ],
+     "position": 1
+    }
+   ],
+   "expected": {
+    "error": "Select a final position in the destination group."
+   }
+  },
+  {
+   "name": "30 keep the same sibling move free",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     [
+      "a1"
+     ],
+     "B"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [],
+     "position": 1
+    }
+   ],
+   "expected": [
+    "B",
+    "A",
+    [
+     "a1"
+    ]
+   ]
+  },
+  {
+   "name": "31 retain the current position",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     [
+      "a1"
+     ],
+     "B"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [],
+     "position": 0
+    }
+   ],
+   "expected": [
+    "A",
+    [
+     "a1"
+    ],
+    "B"
+   ]
+  },
+  {
+   "name": "32 refuse an invalid parent path",
+   "function": "moveSubtree",
+   "args": [
+    [
+     "A",
+     "B"
+    ],
+    {
+     "path": [
+      0
+     ],
+     "parent": [
+      -1
+     ],
+     "position": 0
+    }
+   ],
+   "expected": {
+    "error": "Select a scene in the preview."
+   }
   }
  ]
 }
