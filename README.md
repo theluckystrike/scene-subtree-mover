@@ -28,7 +28,7 @@ The position is the final numbered slot. For example, position three places the 
 
 Select a chapter or scene, then choose Destination parent. Select another chapter to place the subtree under it. Select Manuscript root to promote a nested scene. Choose the final numbered position in that group and select Preview move. The selected scene keeps all its children and descendants. A single move is free.
 
-The destination list excludes the selected scene and its descendants. This prevents a scene from becoming its own parent. The preview rejects moves that exceed the tree limits. Empty child arrays remain valid after the last child moves out. Apply uses the existing source backup and conflict check.
+The destination list excludes the selected scene and its descendants. The preview rejects moves that exceed the tree limits. Empty child arrays remain valid after the last child moves out. Apply uses the existing source backup and conflict check.
 
 <img src="https://raw.githubusercontent.com/theluckystrike/scene-subtree-mover/HEAD/docs/destination-parent.png" alt="Arrival and its descendants move under Pursuit in the resulting order" width="720">
 
@@ -70,7 +70,7 @@ When the plugin has a community listing, use Browse in Community plugins and sea
 4. Select Preview move and check both order panels.
 5. Select Back up and apply. Keep the reported backup.
 
-The operation changes `longform.scenes`. It does not rename scene notes or move folders. The body text stays outside the YAML replacement. The update keeps unrelated frontmatter data. YAML serialization can change comments, spacing, quotes, and the form of aliases.
+The operation changes `longform.scenes`. It does not rename scene notes or move folders. The body text stays outside the YAML replacement. Unrelated frontmatter values stay the same. YAML serialization can change comments, spacing, quotes, number forms, and aliases. The plugin refuses an unquoted whole number above 2^53, because the write would change it.
 
 For a conflict, close the modal and inspect the current index. Run the command again to read a fresh source. Do not use an old preview to recover an external edit.
 
@@ -88,7 +88,7 @@ Yes. Choose the other chapter in Destination parent, then choose the final posit
 
 ### How do I recover the original source?
 
-Open the reported `.scene-backup-…md.bak` file in a text editor and compare it with the index. To recover the complete original text, copy the backup content into the index after you check for later edits. Saved orders change only the sequence; they do not restore body edits or comments.
+Open the reported `.scene-backup-…md.bak` file in a text editor and compare it with the index. To recover the complete original text, copy the backup content into the index after you check for later edits. Saved orders do not restore body edits or comments.
 
 ### What are the input limits?
 

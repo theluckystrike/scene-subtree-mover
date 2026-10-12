@@ -1,6 +1,6 @@
 {
 	"name": "scene-subtree-mover",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"private": true,
 	"description": "Move a chapter and its child scenes together in a manuscript index.",
 	"main": "main.js",

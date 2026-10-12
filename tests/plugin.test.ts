@@ -96,6 +96,15 @@ describe('index data', () => {
 		expect(updated.longform.scenes).toEqual(['B', 'A']);
 	});
 
+	it('refuses an index with a whole number that a YAML write would change', async () => {
+		const source = '---\nzotero: 12345678901234567890\nlongform:\n  scenes: [A, B]\n---\nBody';
+		expect(() => readIndex(source)).toThrow('zotero');
+		expect(() => replaceScenes(source, readTree(['B', 'A']))).toThrow('quotes');
+		const f = fixture(['A', 'B'], source);
+		await expect(f.plugin.readPreview(f.file as never)).rejects.toThrow('2^53');
+		expect(readIndex('---\nzotero: "12345678901234567890"\nsafe: 9007199254740991\nlongform:\n  scenes: [A, B]\n---\nBody').data.safe).toBe(9007199254740991);
+	});
+
 	it.each(['# No frontmatter', '---\ntitle: Book\n---\nBody', '---\nlongform: null\n---\nBody', '---\nlongform:\n  scenes: false\n---\nBody'])('rejects unsupported index %j', (source) => {
 		expect(() => readIndex(source)).toThrow();
 	});
