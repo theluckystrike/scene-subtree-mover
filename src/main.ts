@@ -32,7 +32,7 @@ export default class SceneSubtreeMoverPlugin extends Plugin {
 	async onload(): Promise<void> {
 		await this.loadSettings();
 		if (this.stopped) return;
-		const pro = createGitHubSponsors(this.app, this.manifest.id, SPONSORS);
+		const pro = createGitHubSponsors(this.app, this.manifest.id, SPONSORS, this);
 		pro.init();
 		this.pro = pro;
 		bindPro(pro);
