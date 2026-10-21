@@ -6,6 +6,8 @@ import { SPONSORS, bindPro, isPro, resetPro } from './pro';
 import { DEFAULT_SETTINGS, normalizeSettings, SceneSubtreeMoverSettingTab, type SavedOrder, type SceneSubtreeMoverSettings } from './settings';
 import { checkRestore, readTree, sameOrder, writeTree, type SceneNode } from './tree';
 import { SceneMoverModal } from './modal';
+import { setupHello } from './hello/index';
+import WHATS_NEW from './whats-new.json';
 
 export interface OrderPreview {
 	file: TFile;
@@ -30,6 +32,8 @@ export default class SceneSubtreeMoverPlugin extends Plugin {
 	private saveQueue: Promise<void> = Promise.resolve();
 
 	async onload(): Promise<void> {
+		// First: "What's new" reads its state before the settings load (packages/hello). It does not wait.
+		setupHello(this, WHATS_NEW);
 		await this.loadSettings();
 		if (this.stopped) return;
 		const pro = createGitHubSponsors(this.app, this.manifest.id, SPONSORS, this);

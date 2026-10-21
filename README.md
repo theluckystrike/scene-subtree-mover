@@ -60,7 +60,7 @@ Select a saved order and Preview saved order to restore its sequence. The check 
 
 The plugin requires Obsidian 1.13.4 or later. For manual installation, put `main.js`, `manifest.json`, and `styles.css` in `<vault>/.obsidian/plugins/scene-subtree-mover/`. Enable it under Settings → Community plugins after you review the source.
 
-When the plugin has a community listing, use Browse in Community plugins and search for Scene Subtree Mover. Longform need not be enabled to read the index, but the file must use its nested scene-array format.
+You can also use Browse in Community plugins and search for Scene Subtree Mover. Longform need not be enabled to read the index, but the file must use its nested scene-array format.
 
 ## Usage
 
@@ -76,15 +76,13 @@ For a conflict, close the modal and inspect the current index. Run the command a
 
 ## Settings
 
+After a minor or major update, this plugin opens one What's new tab in the background. The tab and settings card suggest other NoteMods plugins and Zovo Chat and link to notemods.com for feedback ([privacy](https://notemods.com/privacy/)). The tab sends no data. Turn the tab off in Settings.
+
 The settings tab contains the source backup explanation, the number of saved orders, and the GitHub Sponsors controls. There is no backup-disable setting. The backup folder is the folder that contains the index.
 
 Saved orders belong to the index path. A renamed index does not use orders saved under its former path. Stored order names accept 1 to 120 characters. The plugin keeps named orders in its `data.json`. Include that file in your backup plan if you need those variants.
 
 ## FAQ
-
-### Can I move a chapter into another chapter?
-
-Yes. Choose the other chapter in Destination parent, then choose the final position. The preview keeps all descendants with the selected chapter. You can also choose Manuscript root to promote a scene. The selected scene and its descendants cannot be destination parents.
 
 ### How do I recover the original source?
 

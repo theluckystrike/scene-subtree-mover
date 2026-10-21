@@ -3,6 +3,7 @@ import { sponsorsSettingItems } from './license/github-obsidian';
 import { PRO_UI } from './pro';
 import { readTree, type SceneArray } from './tree';
 import type SceneSubtreeMoverPlugin from './main';
+import { helloSettingItems } from './hello/settings';
 
 export interface SavedOrder {
 	name: string;
@@ -37,6 +38,11 @@ export class SceneSubtreeMoverSettingTab extends PluginSettingTab {
 		super(app, plugin);
 	}
 	getSettingDefinitions(): SettingDefinitionItem[] {
+		// The product rows, then the "More from NoteMods" card (packages/hello).
+		return [...this.productSettingDefinitions(), ...helloSettingItems()];
+	}
+
+	productSettingDefinitions(): SettingDefinitionItem[] {
 		return [
 			{ name: 'Source backups', desc: 'A full source backup with the .md.bak extension is created beside the index before a changed order is applied. Keep it until you have checked the manuscript.' },
 			{ name: 'Saved orders', desc: `${this.plugin.settings.orders.length} named orders in local plugin data. Open an index and use the mover to save or restore an order.` },
