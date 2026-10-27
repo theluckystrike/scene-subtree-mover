@@ -1,5 +1,11 @@
 # scene-subtree-mover
 
+## 1.2.1
+
+### Patch Changes
+
+- ba5994a: Add move (Pro), Save named order (Pro) and Preview saved order (Pro) can now be selected without Pro. They show how to get Pro, with a Sponsor on GitHub button. The preview and the saved orders do not change.
+
 ## 1.2.0
 
 ### Minor Changes

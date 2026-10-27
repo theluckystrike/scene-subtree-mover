@@ -1,7 +1,7 @@
 import { Modal, Notice, Setting, type App } from 'obsidian';
 import type SceneSubtreeMoverPlugin from './main';
 import type { OrderPreview } from './main';
-import { isPro, onProChange } from './pro';
+import { isPro, MOVES_LEAD, onProChange, ORDERS_LEAD, proNotice } from './pro';
 import { containsPath, moveSubtree, readTree, sameOrder, sceneChoices, siblingGroup, treeLines, writeTree } from './tree';
 
 export class SceneMoverModal extends Modal {
@@ -67,9 +67,14 @@ export class SceneMoverModal extends Modal {
 		this.parent = [];
 	}
 
-	private button(container: HTMLElement, action: string, label: string, disabled: boolean, fn: () => Promise<void> | void, cta = false): void {
+	/** proLead: when this action needs Pro, a free select shows the Pro notice with this lead and runs nothing. */
+	private button(container: HTMLElement, action: string, label: string, disabled: boolean, fn: () => Promise<void> | void, cta = false, proLead: (() => string | null) | null = null): void {
 		new Setting(container).addButton((button) => {
-			button.setButtonText(label).setDisabled(disabled || this.pending || this.complete).onClick(() => this.run(fn));
+			button.setButtonText(label).setDisabled(disabled || this.pending || this.complete).onClick(() => {
+				const lead = proLead?.() ?? null;
+				if (lead && !isPro()) { proNotice(lead); return; }
+				void this.run(fn);
+			});
 			button.buttonEl.dataset.action = action;
 			if (cta) button.setCta();
 		}).settingEl.addClass('ssm-button-row');
@@ -112,7 +117,7 @@ export class SceneMoverModal extends Modal {
 			dropdown.setValue(String(this.position)).setDisabled(!choices.length || this.pending || this.complete).onChange((value) => { this.position = Number(value); });
 		});
 		const actions = el.createDiv('ssm-actions');
-		this.button(actions, 'preview', this.moves ? 'Add move (Pro)' : 'Preview move', !choices.length || (this.moves > 0 && !isPro()), () => this.stage());
+		this.button(actions, 'preview', this.moves ? 'Add move (Pro)' : 'Preview move', !choices.length, () => this.stage(), false, () => this.moves > 0 ? MOVES_LEAD : null);
 		this.button(actions, 'reset', 'Reset preview', false, () => {
 			this.preview.after = readTree(writeTree(this.preview.before));
 			this.preview.proAction = false;
@@ -143,20 +148,20 @@ export class SceneMoverModal extends Modal {
 		const saved = this.plugin.settings.orders.filter((order) => order.indexPath === this.preview.path);
 		new Setting(details).setName('Order name').setDesc('Save the resulting order in local plugin data. A matching name replaces its saved order.').addText((text) => {
 			text.inputEl.dataset.field = 'order-name';
-			text.setPlaceholder('Alternative ending').setValue(this.orderName).setDisabled(this.pending || this.complete || !isPro()).onChange((value) => { this.orderName = value; });
+			text.setPlaceholder('Alternative ending').setValue(this.orderName).setDisabled(this.pending || this.complete).onChange((value) => { this.orderName = value; });
 		});
-		this.button(details, 'save', 'Save named order (Pro)', !isPro(), async () => {
+		this.button(details, 'save', 'Save named order (Pro)', false, async () => {
 			await this.plugin.saveOrder(this.orderName, this.preview);
 			this.savedName = this.orderName.trim();
 			this.status = `Saved order: ${this.savedName}. The index has not changed.`;
-		});
+		}, false, () => ORDERS_LEAD);
 		new Setting(details).setName('Saved order').addDropdown((dropdown) => {
 			dropdown.selectEl.dataset.field = 'saved-order';
 			dropdown.addOption('', 'Select a saved order');
 			for (const order of saved) dropdown.addOption(order.name, order.name);
-			dropdown.setValue(this.savedName).setDisabled(this.pending || this.complete || !isPro()).onChange((value) => { this.savedName = value; });
+			dropdown.setValue(this.savedName).setDisabled(this.pending || this.complete).onChange((value) => { this.savedName = value; });
 		});
-		this.button(details, 'restore', 'Preview saved order (Pro)', !isPro() || !saved.length, () => {
+		this.button(details, 'restore', 'Preview saved order (Pro)', !saved.length, () => {
 			const order = saved.find((item) => item.name === this.savedName);
 			if (!order) throw new Error('Select a saved order.');
 			this.preview.after = this.plugin.restoreOrder(order, this.preview);
@@ -166,6 +171,6 @@ export class SceneMoverModal extends Modal {
 			this.position = 0;
 			this.parent = [];
 			this.status = `Saved order preview: ${order.name}. Scenes and parent relationships match. Apply makes a backup first.`;
-		});
+		}, false, () => ORDERS_LEAD);
 	}
 }

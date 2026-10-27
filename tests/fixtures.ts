@@ -10,7 +10,7 @@ import { moveTree } from '../src/tree';
 export function enablePro(value = true) {
 	const listeners = new Set<() => void>();
 	const manager = {
-		isPro: () => value,
+		isPro: () => value, getState: () => ({ status: 'signed-out', lastAttemptAt: 0 }), hasToken: () => false, config: { sponsorLogin: 'theluckystrike' },
 		onChange: (fn: () => void) => { listeners.add(fn); return () => { listeners.delete(fn); }; },
 	};
 	bindPro(manager as unknown as SponsorsManager);

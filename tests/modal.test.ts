@@ -35,7 +35,8 @@ describe('mover controls', () => {
 	it('previews a free move and permits a reset before changing the file', async () => {
 		const f = await modalFixture(); select(f.modal, 'position', '2'); await press(f.modal, 'preview');
 		expect(f.modal.contentEl.querySelector('[data-tree="after"]')?.textContent).toBe('1. B\n2. C\n3. A\n  1. a1\n    1. x');
-		expect(f.modal.contentEl.querySelector<HTMLButtonElement>('[data-action="preview"]')?.disabled).toBe(true);
+		// Add move (Pro) stays selectable. A free select shows the Pro notice (tests/pro-notice.test.ts).
+		expect(f.modal.contentEl.querySelector<HTMLButtonElement>('[data-action="preview"]')?.disabled).toBe(false);
 		expect(await f.app.vault.read(f.file)).toBe(f.source);
 		await press(f.modal, 'reset');
 		expect(f.modal.contentEl.querySelector<HTMLButtonElement>('[data-action="preview"]')?.disabled).toBe(false);

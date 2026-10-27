@@ -42,7 +42,7 @@ If backup creation fails, the index stays as it was. The write compares the full
 
 ### Several moves in one preview (Pro)
 
-With Pro, the preview button becomes Add move after the first move. Select the next chapter from the proposed tree, choose its new sibling position, and add the move. The current order panel stays at the source order. The resulting order panel shows the combined changes.
+With Pro, the preview button becomes Add move after the first move. Without Pro, Add move and the named order buttons show a Sponsor notice. Select the next chapter, choose its position, and add the move. The current order panel stays at the source order. The resulting order panel shows the combined changes.
 
 Apply uses one backup and one checked index update for the combined preview. Reset discards the proposed changes. A change in Pro access before Apply prevents a combined update.
 

@@ -1,7 +1,6 @@
 {
 	"name": "scene-subtree-mover",
-	"repository": {"type": "git", "url": "theluckystrike/scene-subtree-mover.git"},
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"private": true,
 	"description": "Move a chapter and its child scenes together in a manuscript index.",
 	"main": "main.js",

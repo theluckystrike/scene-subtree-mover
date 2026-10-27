@@ -2,7 +2,7 @@ import { Notice, Plugin, normalizePath, type TFile } from 'obsidian';
 import { createGitHubSponsors } from './license/github-obsidian';
 import type { SponsorsManager } from './license/index';
 import { checkedUpdate, readIndex } from './index-file';
-import { SPONSORS, bindPro, isPro, resetPro } from './pro';
+import { SPONSORS, bindPro, isPro, resetPro, proText } from './pro';
 import { DEFAULT_SETTINGS, normalizeSettings, SceneSubtreeMoverSettingTab, type SavedOrder, type SceneSubtreeMoverSettings } from './settings';
 import { checkRestore, readTree, sameOrder, writeTree, type SceneNode } from './tree';
 import { SceneMoverModal } from './modal';
@@ -91,7 +91,7 @@ export default class SceneSubtreeMoverPlugin extends Plugin {
 	}
 
 	requirePro(): void {
-		if (!isPro()) throw new Error('This action needs Pro. Sign in with GitHub in the plugin options. A single move, preview and backup are free.');
+		if (!isPro()) throw new Error(proText('This action needs Pro. A single move, preview and backup are free.'));
 	}
 
 	private checkPath(preview: OrderPreview): void {
