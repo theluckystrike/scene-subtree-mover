@@ -94,11 +94,13 @@ The reader rejects more than 10,000 array entries or more than 64 child levels. 
 
 ### What was not tested?
 
-The tests did not cover mobile devices, Linux, live GitHub payments, live device sign-in, the Longform interface, or multi-device sync. Pro UI tests use a local test response. The runtime uses public Obsidian and browser APIs, with no Node or Electron calls. A mobile device check is still needed.
+The tests did not cover mobile devices, Linux, live GitHub payments, live device sign-in, the Longform interface, or multi-device sync. Pro UI tests use a local test response. The runtime uses public Obsidian and browser APIs, with no Node or Electron calls.
 
 ## Payment, account and network
 
 The core features are free. Pro features need a GitHub Sponsors sponsorship of theluckystrike: $5 a month or more, or $15 once. A total payment of $15 meets the payment requirement for Pro without further payment. Sign-in and the checks below still apply. Your notes stay readable and editable with or without Pro.
+
+[One payment turns on Pro in every NoteMods plugin](https://notemods.com/pro/).
 
 GitHub handles the payment. Sponsor at https://github.com/sponsors/theluckystrike?frequency=one-time&metadata_source=scene-subtree-mover. You need no account for the free features. Pro needs the GitHub account that sponsors.
 
