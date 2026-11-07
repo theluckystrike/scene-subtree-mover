@@ -1,9 +1,9 @@
 {
 	"id": "scene-subtree-mover",
 	"name": "Scene Subtree Mover",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"changes": [
-		"Add move (Pro), Save named order (Pro) and Preview saved order (Pro) can now be selected without Pro. They show how to get Pro, with a Sponsor on GitHub button. The preview and the saved orders do not change."
+		"The Pro notice of Scene Subtree Mover now says that one payment turns on Pro in every NoteMods plugin."
 	],
 	"tip": "Select Manuscript root in Destination parent to promote a nested scene.",
 	"thanks": "Hi, I am Michael, a solo developer in Poland. Scene Subtree Mover is one of over 100 small plugins that I make. Thank you for using it with your writing.",

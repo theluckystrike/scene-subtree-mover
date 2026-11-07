@@ -7,7 +7,7 @@ import { fixture } from './fixtures';
 
 // A free user can select Add move (Pro), Save named order (Pro) and Preview saved order (Pro). The select shows the shared
 // Pro notice with the "Sponsor on GitHub" button. The preview, the status line and the saved orders do not change.
-const PITCH = 'Sponsor on GitHub, then sign in from the plugin settings.';
+const PITCH = 'One payment turns on Pro in every NoteMods plugin. Sponsor on GitHub, then sign in from the plugin settings.';
 const MOVES = 'More than one move in a preview needs Pro. A single move, preview and backup are free.';
 const ORDERS = 'Named manuscript orders need Pro.';
 const notice = (lead: string) => ({ text: `${lead} ${PITCH}Sponsor on GitHub`, buttons: 1 });
